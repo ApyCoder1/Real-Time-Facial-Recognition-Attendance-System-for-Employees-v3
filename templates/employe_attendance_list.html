@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Employe Attendance List</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"> <!-- Font Awesome -->
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        .container {
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .table-responsive {
+            margin-top: 20px;
+            flex-grow: 1;
+        }
+        .table thead th {
+            vertical-align: middle;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+        }
+        .table tbody tr:hover {
+            background-color: #e9ecef;
+        }
+        .table td, .table th {
+            vertical-align: middle;
+            text-align: center;
+        }
+        .heading {
+            text-align: center;
+            margin: 40px 0;
+            color: #007bff;
+        }
+        .footer {
+            margin-top: auto;
+            padding: 10px 0;
+            text-align: left;
+        }
+        .back-icon {
+            padding: 10px;
+            font-size: 1.5em;
+            color: #007bff;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .back-icon:hover {
+            color: #0056b3;
+        }
+        .form-inline .form-control {
+            width: auto;
+            flex: 1 1 auto;
+        }
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .filter-container .input-group {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .filter-container .input-group:last-child {
+            margin-right: 0;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #b3a400;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2 class="heading">Employe Attendance Records</h2>
+    
+    <!-- Display total attendance count -->
+    <p class="text-center"><strong>Total Attendance Records: </strong>{{ total_attendance_count }}</p>
+
+    <form method="get" class="filter-container">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Search for Employee..." value="{{ search_query }}">
+            <div class="input-group-append">
+                <button class="btn btn-custom" type="submit"><i class="fas fa-search"></i> Search</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <input type="text" name="roll_no" class="form-control" placeholder="Search by Emp ID" value="{{ roll_no_filter }}">
+            <div class="input-group-append">
+                <button class="btn btn-custom" type="submit"><i class="fas fa-search"></i> Emp ID</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <select name="status" class="form-control">
+                <option value="">Select Status</option>
+                <option value="Present" {% if status_filter == 'Present' %}selected{% endif %}>Present</option>
+                <option value="Absent" {% if status_filter == 'Absent' %}selected{% endif %}>Absent</option>
+                <option value="Leave" {% if status_filter == 'Leave' %}selected{% endif %}>Leave</option>
+            </select>
+            <div class="input-group-append">
+                <button class="btn btn-custom" type="submit"><i class="fas fa-filter"></i> Status</button>
+            </div>
+        </div>
+        <div class="input-group">
+            <input type="date" name="attendance_date" class="form-control" value="{{ date_filter }}">
+            <div class="input-group-append">
+                <button class="btn btn-custom" type="submit"><i class="fas fa-calendar-alt"></i> Filter</button>
+            </div>
+        </div>
+    </form>
+    
+    <!-- Attendance Table -->
+    <div class="table-responsive attendance-table">
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Employee Name</th>
+                    <th>Emp ID</th>
+                    <th>Attendance Date</th>
+                    <th>Status</th>
+                    <th>Late</th>
+                    <th>Check-in Time</th>
+                    <th>Check-out Time</th>
+                    <th>Stayed Time</th>
+                    <th>Over Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in employe_attendance_data %}
+                    {% if data.attendance_records %}
+                        {% for attendance in data.attendance_records %}
+                            <tr>
+                                <td>{{ data.employe.name }}</td>
+                                <td>{{ data.employe.emp_id }}</td>
+                                <td>{{ attendance.date }}</td>
+                                <td>{{ attendance.status }}</td>
+                                <td>{{ attendance.is_late|yesno:"Yes,No" }}</td>
+                                <td>
+                                    {% if attendance.check_in_time %}
+                                        {{ attendance.check_in_time|date:"h:i:s A" }}
+                                    {% else %}
+                                        Not Checked In
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if attendance.check_out_time %}
+                                        {{ attendance.check_out_time|date:"h:i:s A" }}
+                                    {% else %}
+                                        Not Checked Out
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if attendance.check_in_time and attendance.check_out_time %}
+                                        {{ attendance.calculate_duration }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="overtime" data-overtime="{{ attendance.overtime_hours }}">{{ attendance.overtime_hours }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">No attendance records found for {{ data.employe.name }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="footer">
+        <i class="fas fa-arrow-left back-icon" onclick="location.href='/'"></i> <!-- Font Awesome back icon -->
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- JavaScript to Format Overtime -->
+<script>
+    function formatOvertime(decimalHours) {
+        if (!decimalHours || isNaN(decimalHours)) return "0h 0m 0s";
+
+        let totalSeconds = Math.round(decimalHours * 3600);
+        let hours = Math.floor(totalSeconds / 3600);
+        let minutes = Math.floor((totalSeconds % 3600) / 60);
+        let seconds = totalSeconds % 60;
+
+        return `${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        let overtimeCells = document.querySelectorAll(".overtime");
+
+        overtimeCells.forEach(cell => {
+            let overtimeValue = parseFloat(cell.getAttribute("data-overtime").trim());
+            cell.innerText = formatOvertime(overtimeValue);
+        });
+    });
+</script>
+</body>
+</html>
