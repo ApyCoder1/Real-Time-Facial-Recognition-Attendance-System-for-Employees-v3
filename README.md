@@ -8,6 +8,8 @@ A cutting-edge solution for **employee attendance management** powered by **faci
 ## 🚀 **Features**
 
 ### **👨‍💼 Admin Dashboard**
+![image](https://github.com/user-attachments/assets/59513f33-d696-485d-8756-415e4fbf033e)
+
 - **Employee Management**  
   - Add, edit, authorize, and delete employees.
   - Upload multiple face embeddings for better recognition accuracy.
@@ -22,6 +24,8 @@ A cutting-edge solution for **employee attendance management** powered by **faci
 - **🕒 Attendance Marking**  
   - Mark attendance with the default camera or IP cameras.
   - Track check-in/check-out times, total stay, and overtime.
+  - ![image](https://github.com/user-attachments/assets/b1d1e325-515b-481e-8943-cd4c15bb50ff)
+
 
 - **⏰ Attendance Policies**  
   - Set check-in and check-out time policies.
@@ -33,8 +37,12 @@ A cutting-edge solution for **employee attendance management** powered by **faci
 
 - **🦺 PPE Compliance Detection**  
   - Detect employee PPE compliance, such as wearing helmets and safety vests.
+  - ![image](https://github.com/user-attachments/assets/b4b8a406-ce33-4142-92be-5e9b14032a97)
+
 
 ### **👩‍💻 Employee Dashboard**
+![image](https://github.com/user-attachments/assets/7e3cde69-5ab4-48ab-9bf7-17054e34318a)
+
 - **Project Overview & Attendance**  
   - View the total number of projects, late check-ins, absences, and recent attendance logs (check-in/check-out times, stay time, overtime).
   
